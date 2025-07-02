@@ -55,7 +55,7 @@ async def scrape_product_page(url):
     print("[DEBUG] Before playwright launch")
     async with async_playwright() as p:
         print("[DEBUG] Playwright started")
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(headless=True, args=['--no-sandbox'])
         print("[DEBUG] Browser launched")
         context = await browser.new_context()
         page = await context.new_page()
