@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scrape Result</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="col-span-1">
+      <h2 class="text-xl font-semibold mb-4">Images</h2>
+      <div class="space-y-4">
+        {% for img in images %}
+          <img src="{{ img }}" alt="Dress Image" class="rounded-lg shadow w-full" />
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="col-span-2 space-y-6">
+      <section>
+        <h2 class="text-2xl font-bold mb-2">Editor's Notes</h2>
+        <p class="text-gray-700 whitespace-pre-wrap">{{ data.editors_notes }}</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold mb-2">Size & Fit</h2>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for item in data.size_fit %}
+            <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+
+        <h3 class="text-xl font-semibold mt-4">Model Measurements</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for item in data.model_measurements %}
+            <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold mb-2">Details & Care</h2>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for item in data.details_care %}
+            <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold mb-2">Size Guide</h2>
+        {% if data.size_guide_popup is mapping %}
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border rounded-md shadow">
+              <thead>
+                <tr class="bg-gray-200 text-left">
+                  <th class="p-2">Label</th>
+                  {% for h in data.size_guide_popup.values()|first %}
+                    <th class="p-2">{{ h }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for label, details in data.size_guide_popup.items() %}
+                  <tr class="border-t">
+                    <td class="p-2 font-medium">{{ label }}</td>
+                    {% for val in details.values() %}
+                      <td class="p-2">{{ val }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-gray-600">No size guide available.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+</body>
+</html>
