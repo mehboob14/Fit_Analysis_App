@@ -55,7 +55,7 @@ async def scrape_product_page(url):
     print("[DEBUG] Before playwright launch")
     async with async_playwright() as p:
         print("[DEBUG] Playwright started")
-        browser = await p.chromium.launch(headless=False)
+        browser = await p.chromium.launch(headless=True)
         print("[DEBUG] Browser launched")
         context = await browser.new_context()
         page = await context.new_page()
@@ -80,7 +80,7 @@ async def scrape_product_page(url):
 
         await page.wait_for_timeout(3000)
 
-        # --- Scraping logic ---
+   
         print("[DEBUG] Extracting HTML content")
         full_html = await page.content()
         soup = BeautifulSoup(full_html, 'html.parser')
@@ -134,7 +134,7 @@ async def scrape_product_page(url):
             print(f"[DEBUG] Size guide popup error: {e}")
             result["size_guide_popup"] = "Popup not loaded"
 
-        # Images
+     
         image_urls = []
         carousel_track = soup.select_one('ul.ImageCarousel88__track')
         noscripts = carousel_track.select('noscript img') if carousel_track else []
