@@ -11,6 +11,7 @@ import os
 OPENAI_MODEL = "gpt-4.1"
 api_key = os.getenv("OPENAI_API_KEY")
 
+
 def encode_image(image_path: str) -> str:
     image = cv2.imread(image_path)
     if image is None:

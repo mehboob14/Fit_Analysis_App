@@ -2,33 +2,41 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analysis Results</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100 text-gray-800 p-6">
-  <div class="max-w-4xl mx-auto">
+  <div class="max-w-4xl mx-auto space-y-8">
+
     {% if analysis %}
+
+    {% if analysis.Conclusion %}
+    <div class="bg-white rounded-2xl shadow-lg p-8 border-l-8 border-blue-600">
+      <h1 class="text-3xl font-bold mb-4 text-blue-700">Final Conclusion</h1>
+      <p class="text-lg leading-relaxed text-gray-700">{{ analysis.Conclusion }}</p>
+    </div>
+    {% endif %}
+
+
     {% for section, result in analysis.items() %}
-    <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
-      <h2 class="text-2xl font-semibold mb-4 text-blue-700 capitalize border-b pb-2 border-gray-200">
-        {{ section.replace('_', ' ') }}
-      </h2>
-      <ul class="space-y-2">
+    {% if section != "Conclusion" %}
+    <div class="bg-white rounded-xl shadow p-4">
+      <h2 class="text-xl font-semibold text-blue-600 border-b mb-3 pb-1">{{ section.replace('_', ' ') }}</h2>
+      <ul class="text-sm space-y-1">
         {% for key, value in result.items() %}
         {% if value != 'skipped' and not key.endswith('_summary') and key != 'error' %}
         {% if value is mapping %}
-        <li class="mb-2">
-          <div class="font-semibold text-blue-600 capitalize mb-1">{{ key.replace('_', ' ') }}</div>
-          <ul class="pl-4 space-y-1">
+        <li class="mb-1">
+          <div class="font-semibold text-gray-700">{{ key.replace('_', ' ') }}</div>
+          <ul class="pl-4 list-disc text-gray-600">
             {% for sub_key, sub_value in value.items() %}
             {% if sub_value != 'skipped' %}
-            <li class="flex justify-between items-center">
-              <span class="capitalize">{{ sub_key.replace('_', ' ') }}</span>
-              <span
-                class="{% if sub_value == 'yes' %}text-green-600{% elif sub_value == 'no' %}text-gray-500{% endif %} font-medium">
+            <li>
+              <span class="capitalize">{{ sub_key.replace('_', ' ') }}:</span>
+              <span class="{% if sub_value == 'yes' %}text-green-600{% elif sub_value == 'no' %}text-gray-500{% endif %} font-medium">
                 {{ sub_value }}
               </span>
             </li>
@@ -37,10 +45,9 @@
           </ul>
         </li>
         {% else %}
-        <li class="flex justify-between items-center">
-          <span class="capitalize">{{ key.replace('_', ' ') }}</span>
-          <span
-            class="{% if value == 'yes' %}text-green-600{% elif value == 'no' %}text-gray-500{% endif %} font-medium">
+        <li class="flex justify-between border-b border-dashed pb-1">
+          <span class="capitalize text-gray-700">{{ key.replace('_', ' ') }}</span>
+          <span class="{% if value == 'yes' %}text-green-600{% elif value == 'no' %}text-gray-500{% endif %} font-medium">
             {{ value }}
           </span>
         </li>
@@ -54,15 +61,18 @@
         {% endif %}
       </ul>
     </div>
+    {% endif %}
     {% endfor %}
+
     {% elif data %}
     <div class="bg-white rounded-xl p-6 shadow-md">
       <h2 class="text-2xl font-bold text-blue-700 mb-4">Scraped Data</h2>
       <pre class="bg-gray-100 p-4 rounded text-sm overflow-x-auto">{{ data | tojson(indent=2) }}</pre>
     </div>
     {% else %}
-    <p class="text-center text-gray-600 mt-10">Error occured</p>
+    <p class="text-center text-gray-600 mt-10">Error occurred</p>
     {% endif %}
+
   </div>
 </body>
 

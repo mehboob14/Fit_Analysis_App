@@ -8,10 +8,9 @@ from PIL import Image
 from io import BytesIO
 import pillow_avif
 
-DATA_DIR = os.path.join(os.path.dirname(__file__),'Scripts', 'data')
+DATA_DIR = os.path.join(os.path.dirname(__file__),'Scripts','data')
 IMAGES_DIR = os.path.join(DATA_DIR, 'images')
 DOWNLOADED_IMAGES_DIR = os.path.join(IMAGES_DIR, 'downloaded')
-
 
 def download_images(image_links, save_dir=DOWNLOADED_IMAGES_DIR):
     print("[DEBUG] Starting download_images")
@@ -49,7 +48,6 @@ def download_images(image_links, save_dir=DOWNLOADED_IMAGES_DIR):
             print(f"[DEBUG] Failed to download image: {e}")
             pass
 
-
 async def scrape_product_page(url):
     print("[DEBUG] scraping started")
     print("[DEBUG] Before playwright launch")
@@ -60,36 +58,30 @@ async def scrape_product_page(url):
         context = await browser.new_context()
         page = await context.new_page()
         print("[DEBUG] Page created")
-
+        await page.goto(url)
+        print(f"[DEBUG] Went to {url}")
+        await page.wait_for_timeout(4000)
         try:
-            print("[DEBUG] Trying to open https://www.google.com")
-            await page.goto("https://www.google.com", timeout=10000)
-            print("[DEBUG] Successfully opened https://www.google.com")
+            await page.wait_for_selector("label[for='Size & Fit-open']", timeout=5000)
+            await page.click("label[for='Size & Fit-open']")
+            await page.wait_for_timeout(2500)
+            print("[DEBUG] Clicked Size & Fit-open")
         except Exception as e:
-            print(f"[DEBUG] Failed to open Google: {e}")
-
-
+            print(f"[DEBUG] Size & Fit-open not found: {e}")
         try:
-            print(f"[DEBUG] Trying to open real target URL: {url}")
-            await page.goto(url, timeout=20000)
-            print(f"[DEBUG] Successfully opened target URL: {url}")
+            await page.wait_for_selector('[data-testid="accordion-sizeguide-link"] a.SizeChartLink88__sizeGuideLink', timeout=3000)
+            await page.click('[data-testid="accordion-sizeguide-link"] a.SizeChartLink88__sizeGuideLink')
+            await page.wait_for_timeout(4000)
+            print("[DEBUG] Clicked size guide link")
         except Exception as e:
-            print(f"[DEBUG] Failed to open target URL: {e}")
-            await browser.close()
-            return {}
-
-        await page.wait_for_timeout(3000)
-
-   
+            print(f"[DEBUG] Size guide link not found: {e}")
         print("[DEBUG] Extracting HTML content")
         full_html = await page.content()
         soup = BeautifulSoup(full_html, 'html.parser')
         result = {}
-
         editors_notes = soup.select_one('#EDITORS_NOTES .EditorialAccordion88__accordionContent--editors_notes')
         result["editors_notes"] = editors_notes.get_text(strip=True, separator="\n") if editors_notes else "Not found"
         print(f"[DEBUG] Editors Notes: {result['editors_notes'][:50]}...")
-
         size_fit_section = soup.select_one('#SIZE_AND_FIT .EditorialAccordion88__accordionContent--size_and_fit')
         size_fit_details = []
         model_measurements = []
@@ -105,11 +97,9 @@ async def scrape_product_page(url):
         result["model_measurements"] = model_measurements
         print(f"[DEBUG] Size & Fit details: {size_fit_details}")
         print(f"[DEBUG] Model measurements: {model_measurements}")
-
         details_care_section = soup.select_one('#DETAILS_AND_CARE .EditorialAccordion88__accordionContent--details_and_care')
         result["details_care"] = [li.get_text(strip=True) for li in details_care_section.find_all('li')] if details_care_section else []
         print(f"[DEBUG] Details & Care: {result['details_care']}")
-
         try:
             overlay_html = await page.inner_html(".Overlay9.SizeChart88__sizeGuide")
             overlay_soup = BeautifulSoup(overlay_html, "html.parser")
@@ -133,8 +123,6 @@ async def scrape_product_page(url):
         except Exception as e:
             print(f"[DEBUG] Size guide popup error: {e}")
             result["size_guide_popup"] = "Popup not loaded"
-
-     
         image_urls = []
         carousel_track = soup.select_one('ul.ImageCarousel88__track')
         noscripts = carousel_track.select('noscript img') if carousel_track else []
@@ -149,20 +137,16 @@ async def scrape_product_page(url):
                     image_urls.append(preferred)
         image_urls = list(dict.fromkeys(image_urls))
         print(f"[DEBUG] Found {len(image_urls)} image URLs")
-
         os.makedirs(IMAGES_DIR, exist_ok=True)
         file_path = os.path.join(IMAGES_DIR, "image_urls.txt")
         with open(file_path, "w", encoding="utf-8") as f:
             f.write("image urls:\n")
             for url in image_urls:
                 f.write(url + "\n")
-
         download_images(image_urls)
-
         await browser.close()
         print("[DEBUG] Browser closed")
         return result
-
 
 def run_scrape_and_save(url):
     try:
@@ -172,9 +156,7 @@ def run_scrape_and_save(url):
         print(f"[DEBUG] DATA_DIR: {DATA_DIR}")
         print(f"[DEBUG] IMAGES_DIR: {IMAGES_DIR}")
         print(f"[DEBUG] DOWNLOADED_IMAGES_DIR: {DOWNLOADED_IMAGES_DIR}")
-
         data = asyncio.run(scrape_product_page(url))
-
         details_path = os.path.join(DATA_DIR, "dress_details.txt")
         print(f"[DEBUG] Writing details to: {details_path}")
         with open(details_path, "w", encoding="utf-8") as f:
@@ -188,12 +170,10 @@ def run_scrape_and_save(url):
             f.write("\nDETAILS & CARE:\n")
             for item in data.get("details_care", []):
                 f.write("- " + item + "\n")
-
         size_guide_path = os.path.join(DATA_DIR, "Size_guide.json")
         print(f"[DEBUG] Writing size guide to: {size_guide_path}")
         with open(size_guide_path, "w", encoding="utf-8") as f:
             json.dump(data.get("size_guide_popup", {}), f, ensure_ascii=False, indent=2)
-
         print("[DEBUG] run_scrape_and_save completed successfully")
     except Exception as e:
         print(f"[DEBUG] Error during scraping: {e}")

@@ -12,7 +12,7 @@ def run_structure():
     SIZE_GUIDE_PATH = os.path.join(DATA_DIR, 'Size_guide.json')
     OUTPUT_PATH = os.path.join(DATA_DIR, 'formatted_output.json')
 
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
 
     def load_text(filepath):
         with open(filepath, "r", encoding="utf-8") as f:

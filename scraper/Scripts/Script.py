@@ -1,15 +1,14 @@
-
 import base64
-from langchain_openai import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
-from langchain.schema import HumanMessage, AIMessage
 import cv2 as cv
 import os
 import json
 
+from langchain_openai import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain.schema import HumanMessage, AIMessage
+
 OPENAI_MODEL = "gpt-4.1"
 api_key = os.getenv("OPENAI_API_KEY")
-
 def encode_image(image_path):
     image = cv.imread(image_path)
     if image is None:
@@ -17,22 +16,36 @@ def encode_image(image_path):
     _, buffer = cv.imencode(".jpg", image)
     return base64.b64encode(buffer).decode("utf-8")
 
-def run_fit_analysis(front_image_path, side_image_path, json_path=None):
-    print("fit analysis started")
+
+def run_fit_analysis(front_image_path, side_image_path, tags_json_path):
+    print(" Fit analysis started")
+    print(" Using tags JSON path:", tags_json_path)
+
+  
     front_b64 = encode_image(front_image_path)
     side_b64 = encode_image(side_image_path)
 
-    if json_path is None:
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        json_path = os.path.join(base_dir, "scraper", "data", "formatted_output.json")
 
-    with open(json_path, "r", encoding="utf-8") as f:
-        dress_data = json.load(f)
+    with open(tags_json_path, "r", encoding="utf-8") as f:
+        tags_data = json.load(f)
 
-    images = dress_data["images"]
-    dress1 = encode_image(images["model_wearning_front_image"])
-    dress2 = encode_image(images["model_wearning_back_image"])
-    dress3 = encode_image(images["fabric_dress_image"])
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    dresses_json_path = os.path.join(base_dir, "data", "formatted_output.json")
+    print("dresses_path", dresses_json_path)
+    try:
+        with open(dresses_json_path, "r", encoding="utf-8") as f:
+            dress_data = json.load(f)
+    except Exception as e:
+        return {"error": f"Error loading scraped data: {e}"}
+
+    try:
+        dress1 = encode_image(dress_data["images"]["fabric_dress_image"])
+        dress2 = encode_image(dress_data["images"]["model_wearning_back_image"])
+        dress3 = encode_image(dress_data["images"]["model_wearning_front_image"])
+
+    except Exception as e:
+            return {"error": f"Error extracting image path: {e}"}
 
     prompts = [
         {
@@ -44,13 +57,17 @@ def run_fit_analysis(front_image_path, side_image_path, json_path=None):
             "image_b64": [front_b64, side_b64]
         },
         {
-            "prompt": """
-You’re a fashion designer and fit expert. Based on the dress image, 
-fabric details, and the client’s body proportions provided earlier,
-write a one-paragraph narrative-style evaluation. Assess how the dress fits and interacts with the client’s
-body across the waist, bodice, hips, skirt, neckline, flare, fabric, and sleeves.
-Be objective and balanced — highlight both flattering and unflattering elements.
-Give a realistic summary and final verdict: "recommended" or "not recommended".
+            "prompt": f"""
+                You’re a fashion designer and fit expert. Based on the dress images, 
+                fabric details, the client’s body proportions provided earlier, 
+                and the following analysis tags do mention tags while assessing and analyzing, write a one-paragraph narrative-style evaluation.
+
+                Tags: {json.dumps(tags_data)}
+
+                Assess how the dress fits and interacts with the client’s
+                body across the waist, bodice, hips, skirt, neckline, flare, fabric, and sleeves.
+                Be objective and balanced — highlight both flattering and unflattering elements.
+                Give a realistic summary and final verdict: "recommended" or "not recommended".
             """,
             "image_b64": [dress1, dress2, dress3]
         }
@@ -66,7 +83,7 @@ Give a realistic summary and final verdict: "recommended" or "not recommended".
 
     final_response = ""
 
-    for i, step in enumerate(prompts):
+    for step in prompts:
         user_msg_content = []
 
         for img_b64 in step["image_b64"]:
@@ -87,9 +104,16 @@ Give a realistic summary and final verdict: "recommended" or "not recommended".
         ]
 
         response = llm(full_messages)
+
         memory.chat_memory.add_user_message(HumanMessage(content=user_msg_content))
         memory.chat_memory.add_ai_message(AIMessage(content=response.content))
 
-        final_response = response.content 
+        final_response = response.content
+
+        tags_data['Conclusion'] = final_response
+
+        with open(tags_json_path, "w", encoding="utf-8") as f:
+            json.dump(tags_data, f, indent=2)
+
 
     return final_response

@@ -8,6 +8,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage
 
 api_key = os.getenv("OPENAI_API_KEY")
+
 OPENAI_MODEL = "gpt-4.1"
 
 def run_neckline_analysis_from_json(json_path=None) -> Dict[str, Any]:

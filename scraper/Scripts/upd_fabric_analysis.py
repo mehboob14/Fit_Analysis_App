@@ -8,6 +8,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 import os
 
 api_key = os.getenv("OPENAI_API_KEY")
+
 OPENAI_MODEL = "gpt-4.1"
 
 def run_fabric_analysis_from_json(json_path=None):

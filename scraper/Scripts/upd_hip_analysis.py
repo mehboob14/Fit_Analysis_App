@@ -7,6 +7,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 api_key = os.getenv("OPENAI_API_KEY")
+
 llm_model = ChatOpenAI(api_key=api_key)
 
 class HipState(TypedDict, total=False):
