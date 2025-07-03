@@ -55,13 +55,13 @@ async def scrape_product_page(url):
     print("[DEBUG] Before playwright launch")
     async with async_playwright() as p:
         print("[DEBUG] Playwright started")
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.firefox.launch(headless=True)
         print("[DEBUG] Browser launched")
         context = await browser.new_context()
         page = await context.new_page()
         print("[DEBUG] Page created")
 
-        # ✅ Test connectivity to Google first
+
         try:
             print("[DEBUG] Trying to open https://www.google.com")
             await page.goto("https://www.google.com", timeout=10000)
