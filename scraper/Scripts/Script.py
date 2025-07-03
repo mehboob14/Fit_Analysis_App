@@ -58,11 +58,70 @@ def run_fit_analysis(front_image_path, side_image_path, tags_json_path):
         },
         {
             "prompt": f"""
-                You’re a fashion designer and fit expert. Based on the dress images, 
-                fabric details, the client’s body proportions provided earlier, 
-                and the following analysis tags do mention tags while assessing and analyzing, write a one-paragraph narrative-style evaluation.
-
                 Tags: {json.dumps(tags_data)}
+                These are the output tags of the dresses and below are the conditions. 
+
+Fabric
+If fabric is shiny → Calls attention to body
+If fabric is light-colored or patterned → May show undergarments or highlight features
+If fabric is stretchy → Increases comfort
+If fabric is see-through/sheer → Not modest, requires layering
+If fabric retains odor → Less desirable, harder to maintain
+If fabric is not machine washable → High maintenance
+
+Waist
+If dress is tight at the waist → Accentuates waist, flatters hourglass shapes
+If waist is elasticized or cinched → Adds comfort, defines shape
+If there’s no defined waist → Can create a boxy silhouette
+
+Flare
+If skirt is flared → Generally flatters most body types
+If skirt is not flared (straight or tight) → May restrict movement, highlights hip/leg area
+
+Hips
+If skirt is tight at the hips → Accentuates hips
+If skirt has darts/panels at hips → Adds structure, draws attention
+
+Skirt Length
+If skirt reaches high thigh → Not work appropriate, Reveals legs
+If skirt reaches mid thigh → Accentuates legs, still not formal
+If skirt reaches knee or below → Work appropriate, modest
+If skirt is tight around thighs → May ride up, accentuates body lines
+If skirt has slits/buttons at thigh → Reveals more leg, not modest
+
+Hemline
+If hemline is asymmetric/high-low → Draws attention to legs, adds movement
+If hemline is straight → Balanced, formal
+If hemline is too short → Not work appropriate
+
+Neckline
+If neckline is low → Not modest, draws attention to chest
+If neckline is high → Brings attention to the face, modest
+If neckline is plunging/sweetheart → May accentuate bust
+If neckline is off-shoulder → Accentuates shoulders, not conservative
+
+One Shoulder
+If one-shoulder and tight → Accentuates larger upper body, not modest
+If one-shoulder and draped → Adds elegance, softens sharp body lines
+
+Sleeves
+If sleeves are short or sleeveless → Shows arms, may not be modest
+If sleeves are puffy or ruffled → Adds volume, may hide arms
+If armholes are high-set → Makes frame look slimmer
+If sleeves are tight → Accentuates arm shape, not suitable for all body types
+
+Back
+If back is low or open → Not work appropriate, Risk of undergarments showing
+If back is covered or high → Modest and structured
+If back has cutouts → Trendy but less conservative
+
+Bodice
+If bodice has boning/corset → Accentuates waist, flatters bust
+If bodice has built-in support → Good for larger bust
+If bodice is loose/unstructured → May create a boxy or shapeless look
+
+                You’re a fashion designer and fit expert. Based on the dress images, 
+                fabric details, the client’s body proportions provided earlier, write a one-paragraph narrative-style evaluation.
 
                 Assess how the dress fits and interacts with the client’s
                 body across the waist, bodice, hips, skirt, neckline, flare, fabric, and sleeves.
