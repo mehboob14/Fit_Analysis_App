@@ -9,6 +9,24 @@ RUN apt-get update && apt-get install -y \
   libgraphene-1.0-0 libsecret-1-0 fonts-liberation libdrm2 \
   libxshmfence1 xdg-utils \
   libdbus-glib-1-2 libxt6 libx11-xcb1 libxcb-dri3-0 libxcb-shm0 \
+  libgtk-4-1 \
+  libgstreamer-plugins-base1.0-0 \
+  libgstreamer-plugins-good1.0-0 \
+  libgstreamer-plugins-bad1.0-0 \
+  libgstreamer-plugins-ugly1.0-0 \
+  gstreamer1.0-libav \
+  gstreamer1.0-plugins-base \
+  gstreamer1.0-plugins-good \
+  gstreamer1.0-plugins-bad \
+  gstreamer1.0-plugins-ugly \
+  libflite1 \
+  libenchant-2-2 \
+  libhyphen0 \
+  libmanette-0.2-0 \
+  libgles2-mesa \
+  libharfbuzz-icu0 \
+  libavif15 \
+  libx264-155 \
   --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
