@@ -1,5 +1,6 @@
-# Use the official Playwright image with Python 3.11 (matches your ipython==9.3.0)
-FROM mcr.microsoft.com/playwright/python:v1.44.0-jammy-python-3.11
+FROM mcr.microsoft.com/playwright/python:v1.44.0-jammy
+
+
 
 # Install any extra OS packages you really need
 RUN apt-get update && apt-get install -y \
